@@ -1,0 +1,20 @@
+//@version=5
+strategy("SMA Strategy", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.1)
+
+fast_len = input.int(9, "Fast EMA")
+slow_len = input.int(21, "Slow EMA")
+
+ema_fast = ta.ema(close, fast_len)
+ema_slow = ta.ema(close, slow_len)
+
+longCond = ta.crossover(ema_fast, ema_slow)
+exitCond = ta.crossunder(ema_fast, ema_slow)
+
+if longCond
+    strategy.entry("Long", strategy.long)
+
+if exitCond
+    strategy.close("Long")
+
+plot(ema_fast, "Fast EMA", color=color.blue)
+plot(ema_slow, "Slow EMA", color=color.red)

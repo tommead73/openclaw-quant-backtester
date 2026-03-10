@@ -1,0 +1,22 @@
+//@version=5
+strategy("MACD Strategy", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.1)
+
+fast_len = input.int(12, "Fast Length")
+slow_len = input.int(26, "Slow Length")
+sig_len = input.int(9, "Signal Length")
+
+[macdLine, signalLine, histLine] = ta.macd(close, fast_len, slow_len, sig_len)
+
+longCond = ta.crossover(macdLine, signalLine)
+exitCond = ta.crossunder(macdLine, signalLine)
+
+if longCond
+    strategy.entry("Long", strategy.long)
+
+if exitCond
+    strategy.close("Long")
+
+plot(macdLine, "MACD", color=color.blue)
+plot(signalLine, "Signal", color=color.orange)
+plot(histLine, "Histogram", style=plot.style_histogram, color=color.gray)
+hline(0)

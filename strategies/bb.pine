@@ -1,0 +1,29 @@
+//@version=5
+strategy("BB Strategy", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.1)
+
+period = input.int(20, "BB Period")
+devfactor = input.float(2.0, "Dev Factor")
+squeeze_threshold = input.float(0.04, "Squeeze Threshold")
+
+basis = ta.sma(close, period)
+dev = ta.stdev(close, period) * devfactor
+upper = basis + dev
+lower = basis - dev
+bb_width = (upper - lower) / basis
+
+var bool squeeze = false
+if bb_width < squeeze_threshold
+    squeeze := true
+
+longCond = squeeze and close > upper
+if longCond
+    strategy.entry("Long", strategy.long)
+    squeeze := false
+
+if strategy.position_size > 0 and close < lower
+    strategy.close("Long")
+
+plot(basis, "BB Mid", color=color.blue)
+plot(upper, "BB Upper", color=color.red)
+plot(lower, "BB Lower", color=color.green)
+plotchar(squeeze, "Squeeze", "●", location.top, color.yellow, size=size.small)

@@ -1,0 +1,18 @@
+//@version=5
+strategy("RSI Strategy", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.1)
+
+rsi_period = input.int(14, "RSI Period")
+oversold = input.int(30, "Oversold")
+overbought = input.int(70, "Overbought")
+
+rsi_val = ta.rsi(close, rsi_period)
+
+if strategy.position_size == 0 and rsi_val < oversold
+    strategy.entry("Long", strategy.long)
+
+if strategy.position_size > 0 and rsi_val > overbought
+    strategy.close("Long")
+
+plot(rsi_val, "RSI", color=color.purple)
+hline(oversold, "Oversold", color=color.green)
+hline(overbought, "Overbought", color=color.red)

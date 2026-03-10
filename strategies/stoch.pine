@@ -1,0 +1,23 @@
+//@version=5
+strategy("Stoch Strategy", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.1)
+
+period = input.int(14, "Stoch Period")
+k_period = input.int(3, "K Smoothing")
+d_period = input.int(3, "D Smoothing")
+oversold = input.int(20, "Oversold")
+overbought = input.int(80, "Overbought")
+
+k_raw = ta.stoch(close, high, low, period)
+k = ta.sma(k_raw, k_period)
+d = ta.sma(k, d_period)
+
+if strategy.position_size == 0 and k < oversold and k > d
+    strategy.entry("Long", strategy.long)
+
+if strategy.position_size > 0 and k > overbought and k < d
+    strategy.close("Long")
+
+plot(k, "K", color=color.blue)
+plot(d, "D", color=color.orange)
+hline(oversold, "Oversold", color=color.green)
+hline(overbought, "Overbought", color=color.red)
