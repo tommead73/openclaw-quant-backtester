@@ -12,8 +12,10 @@ class MACDStrategy(bt.Strategy):
         self.macd_cross = btind.CrossOver(macd.macd, macd.signal)
 
     def next(self):
+        size = max(1, int((self.broker.getvalue() * 0.02) / self.data.close[0]))
         if not self.position:
             if self.macd_cross > 0:
-                self.buy()
-        elif self.macd_cross < 0:
-            self.sell()
+                self.buy(size=size)
+        else:
+            if self.macd_cross < 0:
+                self.sell()

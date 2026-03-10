@@ -8,8 +8,10 @@ class RSIStrategy(bt.Strategy):
         self.rsi = btind.RSI(self.data.close, period=self.p.period)
 
     def next(self):
+        size = max(1, int((self.broker.getvalue() * 0.02) / self.data.close[0]))
         if not self.position:
             if self.rsi < self.p.oversold:
-                self.buy()
-        elif self.rsi > self.p.overbought:
-            self.sell()
+                self.buy(size=size)
+        else:
+            if self.rsi > self.p.overbought:
+                self.sell()
